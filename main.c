@@ -30,12 +30,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-const int INSTANCE_EXT_CT = 1;
-const char* INSTANCE_EXTS[] = {VK_EXT_DEBUG_UTILS_EXTENSION_NAME};
-
 const char* DEVICE_EXTS[] = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
-
 const int DEVICE_EXT_CT = 1;
+
 const VkFormat SC_FORMAT_PREF = VK_FORMAT_B8G8R8A8_SRGB;
 const VkPresentModeKHR SC_PRESENT_MODE_PREF = VK_PRESENT_MODE_IMMEDIATE_KHR;
 const VkFormat DEPTH_FORMAT = VK_FORMAT_D32_SFLOAT;
@@ -110,7 +107,7 @@ int main(int argc, char** argv) {
 
         // Base
         struct Base base;
-        base_create(window, VALIDATION_ON, INSTANCE_EXT_CT, INSTANCE_EXTS, DEVICE_EXT_CT, DEVICE_EXTS, &base);
+        base_create(window, VALIDATION_ON, 0, NULL, DEVICE_EXT_CT, DEVICE_EXTS, &base);
 
         const VkSampleCountFlagBits sample_ct = base.max_samples > VK_SAMPLE_COUNT_4_BIT ?
        		VK_SAMPLE_COUNT_4_BIT : base.max_samples;
