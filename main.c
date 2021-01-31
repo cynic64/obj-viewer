@@ -11,20 +11,20 @@
 #include <GLFW/glfw3.h>
 #include <vulkan/vulkan.h>
 
-#include "src/camera.h"
-#include "src/obj.h"
-#include "src/texture.h"
-#include "src/timer.h"
+#include "external/render-c/src/camera.h"
+#include "external/render-c/src/obj.h"
+#include "external/render-c/src/texture.h"
+#include "external/render-c/src/timer.h"
 
-#include "src/ll/base.h"
-#include "src/ll/buffer.h"
-#include "src/ll/glfw_error.h"
-#include "src/ll/image.h"
-#include "src/ll/pipeline.h"
-#include "src/ll/set.h"
-#include "src/ll/shader.h"
-#include "src/ll/swapchain.h"
-#include "src/ll/sync.h"
+#include "external/render-c/src/ll/base.h"
+#include "external/render-c/src/ll/buffer.h"
+#include "external/render-c/src/ll/glfw_error.h"
+#include "external/render-c/src/ll/image.h"
+#include "external/render-c/src/ll/pipeline.h"
+#include "external/render-c/src/ll/set.h"
+#include "external/render-c/src/ll/shader.h"
+#include "external/render-c/src/ll/swapchain.h"
+#include "external/render-c/src/ll/sync.h"
 
 #include <assert.h>
 #include <stdlib.h>
