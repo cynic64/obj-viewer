@@ -11,20 +11,20 @@
 #include <GLFW/glfw3.h>
 #include <vulkan/vulkan.h>
 
-#include "external/render-c/src/camera.h"
-#include "external/render-c/src/obj.h"
-#include "external/render-c/src/texture.h"
-#include "external/render-c/src/timer.h"
+#include "external/render-c/include/camera.h"
+#include "external/render-c/include/obj.h"
+#include "external/render-c/include/texture.h"
+#include "external/render-c/include/timer.h"
 
-#include "external/render-c/src/ll/base.h"
-#include "external/render-c/src/ll/buffer.h"
-#include "external/render-c/src/ll/glfw_error.h"
-#include "external/render-c/src/ll/image.h"
-#include "external/render-c/src/ll/pipeline.h"
-#include "external/render-c/src/ll/set.h"
-#include "external/render-c/src/ll/shader.h"
-#include "external/render-c/src/ll/swapchain.h"
-#include "external/render-c/src/ll/sync.h"
+#include "external/render-c/include/ll/base.h"
+#include "external/render-c/include/ll/buffer.h"
+#include "external/render-c/include/ll/glfw_error.h"
+#include "external/render-c/include/ll/image.h"
+#include "external/render-c/include/ll/pipeline.h"
+#include "external/render-c/include/ll/set.h"
+#include "external/render-c/include/ll/shader.h"
+#include "external/render-c/include/ll/swapchain.h"
+#include "external/render-c/include/ll/sync.h"
 
 #include <assert.h>
 #include <stdlib.h>
