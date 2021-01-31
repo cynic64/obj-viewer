@@ -221,9 +221,10 @@ int main(int argc, char** argv) {
 	for (int i = 0; i < mesh_ct; i++) {
         	const char* path = model->materials[i].map_Kd.path;
         	if (path == NULL) {
-                	path = TEXTURE_FALLBACK_PATH;
                 	meshes[i].push_constants.use_textures = 0.0F;
-        	} else meshes[i].push_constants.use_textures = 1.0F;
+        	} else {
+                	meshes[i].push_constants.use_textures = 1.0F;
+        	}
 
         	texture_set_from_path(base.phys_dev, base.device, base.queue, base.cpool, dpool, tex_sampler,
                                       set_tex_layout, path, &textures[i], &meshes[i].set);
