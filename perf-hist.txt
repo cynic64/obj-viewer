@@ -1,0 +1,14 @@
+No multisampling:
+Sponza, only diffuse textures: 490 FPS under NVIDIA, 118 under intel
+
+4x MSAA:
+Sponza, only diffuse textures: 261 FPS under NVIDIA, 82 FPS under intel
+
+4x MSAA with push-constants:
+Sponza, only diffuse textures: 293 FPS under NVIDIA, 80 FPS under intel
+
+^-- + basic diffuse shading
+Sponza: 293 FPS under NVIDIA, 80 under intel
+
++ discard transparent samples
+Sponza: 240 FPS under NVIDIA, 50 under intel
