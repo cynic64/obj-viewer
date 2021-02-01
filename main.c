@@ -413,14 +413,12 @@ int main(int argc, char** argv) {
 	}
 
         // Pipeline
-        VkPipelineVertexInputStateCreateInfo vertex_info = {0};
-        vertex_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-        vertex_info.vertexBindingDescriptionCount = 1;
-        vertex_info.pVertexBindingDescriptions = &vtx_bind_desc;
-        vertex_info.vertexAttributeDescriptionCount = sizeof(vtx_attr_descs) / sizeof(vtx_attr_descs[0]);
-        vertex_info.pVertexAttributeDescriptions = vtx_attr_descs;
-
         struct PipelineSettings pipeline_settings = PIPELINE_SETTINGS_DEFAULT;
+        pipeline_settings.vertex.vertexBindingDescriptionCount = 1;
+        pipeline_settings.vertex.pVertexBindingDescriptions = &vtx_bind_desc;
+        pipeline_settings.vertex.vertexAttributeDescriptionCount = sizeof(vtx_attr_descs) / sizeof(vtx_attr_descs[0]);
+        pipeline_settings.vertex.pVertexAttributeDescriptions = vtx_attr_descs;
+
         pipeline_settings.depth.depthTestEnable = VK_TRUE;
         pipeline_settings.depth.depthWriteEnable = VK_TRUE;
         pipeline_settings.depth.depthCompareOp = VK_COMPARE_OP_LESS;
@@ -429,7 +427,7 @@ int main(int argc, char** argv) {
 
 	VkPipeline pipeline;
 	pipeline_create(base.device, &pipeline_settings,
-	                sizeof(shaders) / sizeof(shaders[0]), shaders, &vertex_info,
+	                sizeof(shaders) / sizeof(shaders[0]), shaders,
 	                pipeline_layout, rpass, 0, &pipeline);
 
 	// Depth buffer
@@ -569,10 +567,7 @@ int main(int argc, char** argv) {
                 } else assert(res == VK_SUCCESS);
 
                 // Record command buffer
-                VkCommandBufferBeginInfo cbuf_begin_info = {0};
-                cbuf_begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-                cbuf_begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-                vkBeginCommandBuffer(cbuf, &cbuf_begin_info);
+                cbuf_begin_onetime(cbuf);
 
                 VkClearValue clear_vals[] = {{{{0.0F, 0.0F, 0.0F, 1.0F}}},
                                              {{{1.0F, 0.0F}}},
