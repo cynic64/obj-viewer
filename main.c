@@ -430,6 +430,10 @@ int main(int argc, char** argv) {
 	                sizeof(shaders) / sizeof(shaders[0]), shaders,
 	                pipeline_layout, rpass, 0, &pipeline);
 
+	// Cleanup pipeline resources
+        vkDestroyShaderModule(base.device, vs, NULL);
+        vkDestroyShaderModule(base.device, fs, NULL);
+
 	// Depth buffer
 	struct Image depth_image;
 	image_create_depth(base.phys_dev, base.device, DEPTH_FORMAT,
@@ -669,13 +673,9 @@ int main(int argc, char** argv) {
         vkDeviceWaitIdle(base.device);
 
         vkDestroyPipeline(base.device, pipeline, NULL);
-
         vkDestroyPipelineLayout(base.device, pipeline_layout, NULL);
 
         vkDestroyRenderPass(base.device, rpass, NULL);
-
-        vkDestroyShaderModule(base.device, vs, NULL);
-        vkDestroyShaderModule(base.device, fs, NULL);
 
         swapchain_destroy(base.device, &swapchain);
 
