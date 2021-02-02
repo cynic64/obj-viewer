@@ -21,6 +21,7 @@
 #include "external/render-c/src/glfw_error.h"
 #include "external/render-c/src/image.h"
 #include "external/render-c/src/pipeline.h"
+#include "external/render-c/src/rpass.h"
 #include "external/render-c/src/set.h"
 #include "external/render-c/src/shader.h"
 #include "external/render-c/src/swapchain.h"
@@ -313,55 +314,49 @@ int main(int argc, char** argv) {
         shaders[1].pName = "main";
 
         // Render pass
-        VkAttachmentDescription attachments[3] = {0};
         // Multisampled color
-        attachments[0].format = swapchain.format;
-        attachments[0].samples = sample_ct;
-        attachments[0].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-        attachments[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-        attachments[0].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-        attachments[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-        attachments[0].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        attachments[0].finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-	// Multisampled depth
-        attachments[1].format = DEPTH_FORMAT;
-        attachments[1].samples = sample_ct;
-        attachments[1].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-        attachments[1].storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-        attachments[1].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-        attachments[1].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-        attachments[1].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        attachments[1].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+        struct RpassAttachment attach_color_multi = {0};
+        attach_color_multi.desc.format = swapchain.format;
+        attach_color_multi.desc.samples = sample_ct;
+        attach_color_multi.desc.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+        attach_color_multi.desc.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+        attach_color_multi.desc.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        attach_color_multi.desc.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        attach_color_multi.desc.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        attach_color_multi.desc.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        attach_color_multi.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
         // Color resolve
-        attachments[2].format = swapchain.format;
-        attachments[2].samples = VK_SAMPLE_COUNT_1_BIT;
-        attachments[2].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-        attachments[2].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-        attachments[2].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-        attachments[2].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-        attachments[2].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        attachments[2].finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        struct RpassAttachment attach_color_resolve = {0};
+        attach_color_resolve.desc.format = swapchain.format;
+        attach_color_resolve.desc.samples = VK_SAMPLE_COUNT_1_BIT;
+        attach_color_resolve.desc.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+        attach_color_resolve.desc.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+        attach_color_resolve.desc.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        attach_color_resolve.desc.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        attach_color_resolve.desc.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        attach_color_resolve.desc.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        attach_color_resolve.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
-        VkAttachmentReference color_multisampled_ref = {0};
-        color_multisampled_ref.attachment = 0;
-        color_multisampled_ref.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+	// Multisampled depth
+        struct RpassAttachment attach_depth = {0};
+        attach_depth.desc.format = DEPTH_FORMAT;
+        attach_depth.desc.samples = sample_ct;
+        attach_depth.desc.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+        attach_depth.desc.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        attach_depth.desc.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        attach_depth.desc.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        attach_depth.desc.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        attach_depth.desc.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+        attach_depth.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
-        VkAttachmentReference depth_ref = {0};
-        depth_ref.attachment = 1;
-        depth_ref.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-
-        VkAttachmentReference color_resolve_ref = {0};
-        color_resolve_ref.attachment = 2;
-        color_resolve_ref.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-        VkSubpassDescription subpass = {0};
-        subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-        subpass.colorAttachmentCount = 1;
-        subpass.pColorAttachments = &color_multisampled_ref;
-        subpass.pDepthStencilAttachment = &depth_ref;
-        subpass.pResolveAttachments = &color_resolve_ref;
+	// Subpass and dependencies
+        struct RpassSubpass subpass = {0};
+        subpass.bind_point = VK_PIPELINE_BIND_POINT_GRAPHICS;
+        subpass.color_attach_ct = 1;
+        subpass.color_attachs = &attach_color_multi;
+        subpass.resolve_attachs = &attach_color_resolve;
+        subpass.depth_attach = &attach_depth;
 
         VkSubpassDependency subpass_dep = {0};
         subpass_dep.srcSubpass = VK_SUBPASS_EXTERNAL;
@@ -374,18 +369,9 @@ int main(int argc, char** argv) {
         subpass_dep.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT
                                   | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 
-        VkRenderPassCreateInfo rpass_info = {0};
-        rpass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-        rpass_info.attachmentCount = sizeof(attachments) / sizeof(attachments[0]);
-        rpass_info.pAttachments = attachments;
-        rpass_info.subpassCount = 1;
-        rpass_info.pSubpasses = &subpass;
-        rpass_info.dependencyCount = 1;
-        rpass_info.pDependencies = &subpass_dep;
-
-        VkRenderPass rpass;
-        res = vkCreateRenderPass(base.device, &rpass_info, NULL, &rpass);
-        assert(res == VK_SUCCESS);
+	// Create render pass
+	VkRenderPass rpass;
+	rpass_create(base.device, 1, &subpass, 1, &subpass_dep, &rpass);
 
         // Push constants
         assert(sizeof(struct PushConstants) <= BASE_MAX_PUSH_CONSTANT_SIZE);
@@ -447,7 +433,7 @@ int main(int argc, char** argv) {
         // Framebuffers
         VkFramebuffer* framebuffers = malloc(swapchain.image_ct * sizeof(framebuffers[0]));
         for (int i = 0; i < swapchain.image_ct; i++) {
-                VkImageView views[] = {color_image.view, depth_image.view, swapchain.views[i]};
+                VkImageView views[] = {color_image.view, swapchain.views[i], depth_image.view};
                 framebuffer_create(base.device, rpass, swapchain.width, swapchain.height,
                                    sizeof(views) / sizeof(views[0]), views, &framebuffers[i]);
         }
@@ -506,8 +492,8 @@ int main(int argc, char** argv) {
                         for (int i = 0; i < swapchain.image_ct; i++) {
                                 vkDestroyFramebuffer(base.device, framebuffers[i], NULL);
 
-                                VkImageView new_fb_views[] = {color_image.view, depth_image.view,
-                                                              swapchain.views[i]};
+                                VkImageView new_fb_views[] = {color_image.view, swapchain.views[i],
+                                                              depth_image.view};
                                 framebuffer_create(base.device, rpass, swapchain.width, swapchain.height,
                                                    sizeof(new_fb_views) / sizeof(new_fb_views[0]),
                                                    new_fb_views, &framebuffers[i]);
@@ -574,8 +560,8 @@ int main(int argc, char** argv) {
                 cbuf_begin_onetime(cbuf);
 
                 VkClearValue clear_vals[] = {{{{0.0F, 0.0F, 0.0F, 1.0F}}},
-                                             {{{1.0F, 0.0F}}},
-                                             {{{0.0F, 0.0F, 0.0F, 1.0F}}}};
+                                             {{{0.0F, 0.0F, 0.0F, 1.0F}}},
+                                             {{{1.0F, 0.0F}}}};
 
                 VkRenderPassBeginInfo cbuf_rpass_info = {0};
                 cbuf_rpass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
